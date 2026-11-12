@@ -1,0 +1,15 @@
+# Secrets - NEVER commit these
+.env
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Local outputs
+output/
+data_cache/

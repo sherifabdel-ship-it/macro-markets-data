@@ -1,0 +1,33 @@
+{
+  "_note": "Starter catalog. revision_risk labels are initial judgements - review them. release_lag_days = typical days after period end before the value is published.",
+  "fred": [
+    {"id": "GDPC1", "name": "US real GDP (chained USD, SAAR)", "unit": "bn chained 2017 USD", "frequency": "Q", "revision_risk": "high", "release_lag_days": 35, "notes": "Advance, second, third estimates, then annual and comprehensive revisions."},
+    {"id": "GDP", "name": "US nominal GDP (SAAR)", "unit": "bn USD", "frequency": "Q", "revision_risk": "high", "release_lag_days": 35, "notes": "Same revision cycle as real GDP."},
+    {"id": "A191RL1Q225SBEA", "name": "US real GDP growth (annualised % QoQ)", "unit": "% annualised", "frequency": "Q", "revision_risk": "high", "release_lag_days": 35, "notes": "The headline growth figure. Revised with GDP."},
+    {"id": "CPIAUCSL", "name": "US CPI all items (SA index)", "unit": "index 1982-84=100", "frequency": "M", "revision_risk": "low", "release_lag_days": 20, "notes": "Seasonal factors revised each year; the unadjusted CPI is not revised."},
+    {"id": "UNRATE", "name": "US unemployment rate (SA)", "unit": "%", "frequency": "M", "revision_risk": "low", "release_lag_days": 10, "notes": "Seasonal factors revised each year."},
+    {"id": "PAYEMS", "name": "US nonfarm payrolls (SA)", "unit": "thousand persons", "frequency": "M", "revision_risk": "medium", "release_lag_days": 10, "notes": "Revised in the next two months, then an annual benchmark revision."},
+    {"id": "INDPRO", "name": "US industrial production index", "unit": "index 2017=100", "frequency": "M", "revision_risk": "medium", "release_lag_days": 20, "notes": "Revised in later releases and annually."},
+    {"id": "RSAFS", "name": "US advance retail sales", "unit": "mn USD", "frequency": "M", "revision_risk": "medium", "release_lag_days": 20, "notes": "Advance estimate is revised the following month and annually."},
+    {"id": "FEDFUNDS", "name": "US effective fed funds rate", "unit": "%", "frequency": "M", "revision_risk": "none", "release_lag_days": 5, "notes": "Monthly average of a market rate."},
+    {"id": "DGS10", "name": "US 10-year Treasury yield", "unit": "%", "frequency": "D", "revision_risk": "none", "release_lag_days": 5, "notes": "Market data, not revised."},
+    {"id": "T10Y2Y", "name": "US 10y minus 2y Treasury spread", "unit": "% points", "frequency": "D", "revision_risk": "none", "release_lag_days": 5, "notes": "Market data, not revised."},
+    {"id": "VIXCLS", "name": "CBOE VIX (close)", "unit": "index", "frequency": "D", "revision_risk": "none", "release_lag_days": 5, "notes": "Spot VIX index. VIXY holds VIX futures, so the two diverge."},
+    {"id": "DRALACBS", "name": "US delinquency rate, all loans, commercial banks (SA)", "unit": "%", "frequency": "Q", "revision_risk": "medium", "release_lag_days": 75, "notes": "Fed bank-reported data, restated at times. Confirm the ID on first live run."},
+    {"id": "DRCCLACBS", "name": "US delinquency rate, credit cards, commercial banks (SA)", "unit": "%", "frequency": "Q", "revision_risk": "medium", "release_lag_days": 75, "notes": "Confirm the ID on first live run."}
+  ],
+  "worldbank": {
+    "indicators": [
+      {"id": "NY.GDP.MKTP.CD", "name": "GDP (current USD)", "unit": "USD", "frequency": "A", "revision_risk": "medium", "release_lag_days": 500, "notes": "Annual; revised in later editions."},
+      {"id": "NY.GDP.MKTP.KD.ZG", "name": "GDP growth (annual %)", "unit": "%", "frequency": "A", "revision_risk": "medium", "release_lag_days": 500, "notes": "Annual; revised in later editions."},
+      {"id": "FP.CPI.TOTL.ZG", "name": "Inflation, consumer prices (annual %)", "unit": "%", "frequency": "A", "revision_risk": "low", "release_lag_days": 500, "notes": "Annual average."},
+      {"id": "SL.UEM.TOTL.ZS", "name": "Unemployment (% of labour force, modelled ILO)", "unit": "%", "frequency": "A", "revision_risk": "medium", "release_lag_days": 500, "notes": "Modelled estimates, revised."}
+    ],
+    "countries": {
+      "USA": "United States", "EGY": "Egypt", "SAU": "Saudi Arabia", "ARE": "United Arab Emirates",
+      "GBR": "United Kingdom", "DEU": "Germany", "FRA": "France", "JPN": "Japan",
+      "CHN": "China", "IND": "India", "TUR": "Turkey", "ZAF": "South Africa"
+    },
+    "notes": "Some countries (Egypt is one) report national accounts on a fiscal year, so the World Bank year label may not match the calendar year. Check before comparing with calendar-year data."
+  }
+}
