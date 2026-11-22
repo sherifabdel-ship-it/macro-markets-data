@@ -1,0 +1,55 @@
+name: update-data
+# Fetches all data on GitHub's servers and publishes the online dashboard (GitHub Pages).
+# Runs every weekday evening after the US close, when the watchlist changes, or on demand ("Run workflow").
+on:
+  schedule:
+    - cron: "37 22 * * 1-5"   # 22:37 UTC, after the US market close
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["config/**", "site/**", "src/**", ".github/workflows/update-data.yml"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.txt && pip install -e .
+      - name: Test before publishing
+        run: pytest -q && node --test tests/js/lib.test.mjs
+      - name: Fetch data and build the site
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: >
+          python -m mmdata.build --config config/watchlist.json --site site --out _site
+          --previous _previous
+          --previous-url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

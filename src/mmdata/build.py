@@ -215,15 +215,43 @@ def summary_markdown(m: dict) -> str:
     return "\n".join(lines)
 
 
+def download_previous(url: str, dest: Path) -> int:
+    """Copy the currently published data so a failed source can fall back to it. Never fatal."""
+    import requests
+    url = url.rstrip("/")
+    try:
+        r = requests.get(f"{url}/data/manifest.json", timeout=30)
+        if r.status_code != 200:
+            print(f"no previous site at {url} (HTTP {r.status_code}); first build")
+            return 0
+        n = 0
+        (dest / "data" / "series").mkdir(parents=True, exist_ok=True)
+        for e in r.json().get("series", []):
+            if not re.fullmatch(r"[A-Za-z0-9_]+", e.get("slug", "")):
+                continue
+            s = requests.get(f"{url}/data/series/{e['slug']}.json", timeout=30)
+            if s.status_code == 200:
+                (dest / "data" / "series" / f"{e['slug']}.json").write_text(s.text)
+                n += 1
+        print(f"downloaded {n} previous series from {url}")
+        return n
+    except Exception as e:
+        print(f"could not download previous site: {e}")
+        return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Build the dashboard's data files.")
     ap.add_argument("--config", default="config/watchlist.json")
     ap.add_argument("--site", default="site")
     ap.add_argument("--out", default="_site")
     ap.add_argument("--previous", default=None, help="folder holding the previously published site (for stale fallback)")
+    ap.add_argument("--previous-url", default=None, help="URL of the live site; its data is downloaded for stale fallback")
     ap.add_argument("--no-crosscheck", action="store_true")
     a = ap.parse_args(argv)
     config = json.loads(Path(a.config).read_text())
+    if a.previous_url and a.previous:
+        download_previous(a.previous_url, Path(a.previous))
     prev = Path(a.previous) if a.previous and Path(a.previous).exists() else None
     m = build(config, Path(a.out), Path(a.site) if Path(a.site).exists() else None, prev, crosscheck=not a.no_crosscheck)
     md = summary_markdown(m)

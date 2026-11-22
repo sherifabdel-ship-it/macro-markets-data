@@ -102,3 +102,28 @@ def test_fred_meta_and_vintage_parsing(monkeypatch):
         {"date": "2024-04-01", "realtime_start": "2024-07-25", "realtime_end": "9999-12-31", "value": "."}]})
     v = fred.fetch_vintages("X", pd.Timestamp("2024-01-01"), pd.Timestamp("2024-12-31"), key="k")
     assert len(v) == 2 and v.realtime_start.iloc[0] == pd.Timestamp("2024-04-25")
+
+
+def test_download_previous_never_fatal(tmp_path, monkeypatch):
+    import requests
+
+    class R:
+        def __init__(self, code, body=None, text=""):
+            self.status_code, self._b, self.text = code, body, text
+
+        def json(self):
+            return self._b
+
+    def get(url, timeout=None):
+        if url.endswith("manifest.json"):
+            return R(200, {"series": [{"slug": "TQQQ_adj_close"}, {"slug": "../evil"}]})
+        return R(200, text='{"n": 5}')
+    monkeypatch.setattr(requests, "get", get)
+    assert build.download_previous("https://x.test/", tmp_path) == 1          # unsafe slug skipped
+    assert (tmp_path / "data" / "series" / "TQQQ_adj_close.json").exists()
+    monkeypatch.setattr(requests, "get", lambda *a, **k: R(404))
+    assert build.download_previous("https://x.test", tmp_path / "b") == 0
+    def boom(*a, **k):
+        raise requests.ConnectionError("down")
+    monkeypatch.setattr(requests, "get", boom)
+    assert build.download_previous("https://x.test", tmp_path / "c") == 0
