@@ -28,6 +28,8 @@ class Series:
     source: str
     notes: str = ""
     params: dict = field(default_factory=dict)
+    agg: str = "mean"  # how to roll up to a lower frequency: last | mean | sum
+    suggest: str = ""  # optional default transform hint for the dashboard: level | pct | diff
 
 
 @dataclass
@@ -42,7 +44,8 @@ class Catalog:
 def load() -> Catalog:
     raw = json.loads((Path(__file__).parent / "series.json").read_text())
     fred = [Series(f"FRED:{r['id']}", "fred", r["name"], r["unit"], r["frequency"], r["revision_risk"],
-                   r["release_lag_days"], "fred", r.get("notes", ""), {"fred_id": r["id"]}) for r in raw["fred"]]
+                   r["release_lag_days"], "fred", r.get("notes", ""), {"fred_id": r["id"]}, r.get("agg", "mean"), r.get("suggest", ""))
+            for r in raw["fred"]]
     wb = [Series(f"WB:{{country}}:{r['id']}", "wb", r["name"], r["unit"], r["frequency"], r["revision_risk"],
                  r["release_lag_days"], "worldbank", r.get("notes", ""), {"indicator": r["id"]})
           for r in raw["worldbank"]["indicators"]]
@@ -77,5 +80,5 @@ def resolve(series_id: str) -> Series:
             return Series(f"{ticker.upper()}.{fld}", "price", f"{ticker.upper()} {fld.replace('_', ' ')}",
                           "shares" if fld == "volume" else "USD", "D", "none", 5, "yahoo",
                           "Market price. Split-adjusted; adj_close also dividend-adjusted.",
-                          {"ticker": ticker.upper(), "field": fld})
+                          {"ticker": ticker.upper(), "field": fld}, "sum" if fld == "volume" else "last")
     raise ValueError(f"{series_id}: unrecognised id. Use TICKER.field, FRED:<id> or WB:<COUNTRY>:<INDICATOR>")

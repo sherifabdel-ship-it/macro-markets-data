@@ -35,3 +35,32 @@ def fake_sources(monkeypatch):
     monkeypatch.setitem(getter.SOURCES, "price_check", fake_close_check)
     monkeypatch.setitem(getter.SOURCES, "fred", fake_fred)
     monkeypatch.setitem(getter.SOURCES, "wb", fake_wb)
+
+
+def fake_vintages(fred_id, start, end):
+    """Quarterly series: archive starts 2015-01-15. Each later quarter is first published ~30 days
+    after quarter end, then revised +1% sixty days later."""
+    rows = []
+    archive0 = pd.Timestamp("2015-01-15")
+    for i, d in enumerate(pd.date_range("2010-01-01", end, freq="QS")):
+        qend = d + pd.offsets.QuarterEnd(0)
+        first_pub = qend + pd.Timedelta(days=30)
+        if first_pub <= archive0:
+            rows.append((d, archive0, 100.0 + i))
+        elif first_pub <= end:
+            rows.append((d, first_pub, 100.0 + i))
+            if first_pub + pd.Timedelta(days=60) <= end:
+                rows.append((d, first_pub + pd.Timedelta(days=60), (100.0 + i) * 1.01))
+    return pd.DataFrame(rows, columns=["date", "realtime_start", "value"])
+
+
+def fake_meta(fred_id):
+    if fred_id == "NOPE":
+        raise ValueError("FRED has no series called NOPE")
+    return {"name": f"Fake {fred_id}", "unit": "Index", "frequency": "M"}
+
+
+@pytest.fixture
+def fake_build_sources(fake_sources, monkeypatch):
+    monkeypatch.setitem(getter.SOURCES, "fred_vintages", fake_vintages)
+    monkeypatch.setitem(getter.SOURCES, "fred_meta", fake_meta)

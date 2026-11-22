@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Macro &amp; markets data</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Macro &amp; markets data</h1>
+  <p class="sub">Prices and economic data in one format, on one timeline, ready to compare. Data only.</p>
+  <p id="asof" class="muted">Loading data...</p>
+  <div id="banner"></div>
+</header>
+<main>
+  <section class="card">
+    <h2><span class="step">1</span> Choose data</h2>
+    <input id="search" type="search" placeholder="Search: TQQQ, GDP, inflation, Egypt..." aria-label="Search series">
+    <div id="picker" class="picker"></div>
+    <p class="muted" id="selcount"></p>
+  </section>
+
+  <section class="card">
+    <h2><span class="step">2</span> Choose timeline</h2>
+    <div class="row">
+      <label>From <input id="from" type="date"></label>
+      <label>To <input id="to" type="date"></label>
+      <span class="quick" id="quick"></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="step">3</span> Does every series cover the timeline?</h2>
+    <div id="coverage"></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="step">4</span> Prepare for comparison</h2>
+    <div id="advice" class="advice"></div>
+    <div class="row">
+      <label>Frequency
+        <select id="freq">
+          <option value="native">As published (no change)</option>
+          <option value="M">Monthly</option>
+          <option value="Q">Quarterly</option>
+          <option value="A">Annual</option>
+        </select>
+      </label>
+      <label>Economic values
+        <select id="basis">
+          <option value="latest">Latest (revised) values</option>
+          <option value="first">First-release values, as originally published</option>
+        </select>
+      </label>
+      <label>Date economic data by
+        <select id="dateBy">
+          <option value="period">The period it describes</option>
+          <option value="available">The period it was published in</option>
+        </select>
+      </label>
+    </div>
+    <div id="transforms"></div>
+    <fieldset class="policy">
+      <legend>Timeline policy</legend>
+      <label><input type="radio" name="policy" value="common" checked> Trim every series to the span all of them cover (best for comparing)</label>
+      <label><input type="radio" name="policy" value="full"> Keep my full timeline (short series will have blanks)</label>
+    </fieldset>
+  </section>
+
+  <section class="card">
+    <h2><span class="step">5</span> Check and download</h2>
+    <div id="delivered"></div>
+    <div class="row buttons">
+      <button id="dlWide" class="primary">Download table (CSV)</button>
+      <button id="dlLong">Download long format (CSV)</button>
+      <button id="dlReport">Download report (JSON)</button>
+      <button id="share">Copy link to this setup</button>
+    </div>
+    <div id="charts" class="charts viz-root"></div>
+    <h3>Latest rows</h3>
+    <div id="preview" class="scroll"></div>
+  </section>
+
+  <section class="card">
+    <h2>Manage</h2>
+    <div id="manage"></div>
+  </section>
+</main>
+<div id="tip" class="tip" hidden></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
