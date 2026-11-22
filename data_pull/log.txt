@@ -1,0 +1,5 @@
+TQQQ: 4221 rows 2010-02-11 to 2026-11-20, dividends 22, splits 8
+QQQ: 4248 rows 2010-01-04 to 2026-11-20, dividends 70, splits 0
+^NDX: 4248 rows 2010-01-04 to 2026-11-20, dividends 0, splits 0
+^XNDX: 1 rows 2026-11-20 to 2026-11-20, dividends 0, splits 0
+yfinance 1.8.0
