@@ -1,0 +1,40 @@
+name: data-pull
+on:
+  push:
+    branches: [data-pull]
+    paths: [".github/workflows/data-pull.yml"]
+permissions:
+  contents: write
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install yfinance pandas
+      - name: Fetch daily prices
+        run: |
+          python - <<'PY'
+          import yfinance as yf, pandas as pd, time
+          for t in ["TQQQ", "^NDX", "^XNDX", "QQQ"]:
+              for i in range(4):
+                  try:
+                      df = yf.Ticker(t).history(start="1985-01-01", interval="1d", auto_adjust=False, actions=True)
+                      if len(df): break
+                  except Exception as e:
+                      print(t, "attempt", i, e)
+                  time.sleep(5 * (i + 1))
+              df.index = pd.to_datetime(df.index).tz_localize(None).date
+              df.index.name = "date"
+              df.to_csv(f"pull/{t.replace('^','IDX_')}.csv")
+              print(t, len(df), df.index.min() if len(df) else None, df.index.max() if len(df) else None)
+          PY
+      - name: Save results to this branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add pull
+          git commit -m "data pull results"
+          git push
