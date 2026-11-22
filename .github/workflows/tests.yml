@@ -1,7 +1,7 @@
 name: tests
 on: [push, pull_request]
 jobs:
-  pytest:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -9,5 +9,9 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - run: pip install -r requirements.txt
       - run: pytest -q
+      - run: node --test tests/js/lib.test.mjs

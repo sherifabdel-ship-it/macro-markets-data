@@ -10,7 +10,8 @@ from . import catalog, schema, timing, validate
 from .sources import fred, stooq, worldbank, yahoo
 
 # Registry so tests (or a future source) can swap implementations.
-SOURCES = {"price": yahoo.fetch, "price_check": stooq.fetch, "fred": fred.fetch, "wb": worldbank.fetch}
+SOURCES = {"price": yahoo.fetch, "price_check": stooq.fetch, "fred": fred.fetch, "wb": worldbank.fetch,
+           "fred_vintages": fred.fetch_vintages, "fred_meta": fred.fetch_meta}
 
 
 @dataclass

@@ -1,8 +1,37 @@
 # macro-markets-data
 
-Fetches **market prices and economic data in one standard format**, cut at one moment in time, so different series can be compared. **Data only** - analysis happens elsewhere.
+**Open the dashboard:** https://sherifabdel-ship-it.github.io/macro-markets-data
 
-## Quick start
+Market prices and economic data in one format, on one timeline, ready to compare. Data only - analysis happens elsewhere.
+Nothing to install: GitHub fetches the data every weekday evening and publishes the page.
+
+## One-time setup (3 clicks on GitHub)
+
+1. **Settings -> Secrets and variables -> Actions -> New repository secret**: name `FRED_API_KEY`, value = your FRED key.
+2. **Settings -> Pages -> Build and deployment -> Source: GitHub Actions.**
+3. **Actions -> update-data -> Run workflow.** After 3-5 minutes the link above works.
+
+## Everyday use
+
+- **Add tickers or series:** edit `config/watchlist.json` on GitHub and commit. Any Yahoo ticker and any FRED series id works. The page updates in a few minutes.
+- **Refresh now:** Actions -> update-data -> Run workflow. Each run shows a table of what worked and what failed.
+- **If a source fails,** the page keeps the last good data and marks it "not refreshed today".
+
+## What the online dashboard does
+
+1. Choose data (search prices, FRED and World Bank series; each shows how often it is revised).
+2. Choose a timeline.
+3. Coverage check: flags any series that does not cover the whole timeline.
+4. Prepare for comparison: recommended frequency and transform (returns, growth, as published), with reasons;
+   latest or **first-release** values; date economic data by the period it describes or **when it was published** (no look-ahead).
+5. Check charts, then download CSV / JSON, or copy a link that reopens the same setup.
+
+Revision labels for FRED series are **measured** from FRED's archive (share of values changed after first release, and by how much).
+
+---
+
+## Local version (optional, needs Python)
+
 
 ```bash
 git clone https://github.com/sherifabdel-ship-it/macro-markets-data
@@ -57,7 +86,11 @@ macro-markets-data/
 ├── requirements.txt
 ├── .env.example               # template; copy to .env (git-ignored)
 ├── .gitignore
-├── .github/workflows/tests.yml
+├── .github/workflows/
+│   ├── tests.yml
+│   └── update-data.yml        # daily fetch + publish to GitHub Pages
+├── config/watchlist.json      # what the online dashboard fetches
+├── site/                      # online dashboard (index.html, app.js, lib.js, style.css)
 ├── app/
 │   └── dashboard.py           # Streamlit UI
 ├── src/mmdata/
@@ -67,6 +100,8 @@ macro-markets-data/
 │   ├── schema.py              # the standard long format
 │   ├── timing.py              # period-end dates, session cutoff
 │   ├── getter.py              # fetch_series(): the main entry point
+│   ├── build.py               # builds the online dashboard's data
+│   ├── revisions.py           # first release, release dates, measured revisions
 │   ├── coverage.py            # coverage report, window policies
 │   ├── validate.py            # price quality checks
 │   ├── http.py                # retries, key redaction
@@ -78,9 +113,9 @@ macro-markets-data/
 └── tests/                     # run: pytest
 ```
 
-## Status and known limits
+## Known limits
 
 - Tests use fake data. **Run the dashboard once with your key to confirm the live sources**; some catalog ids (for example the FRED delinquency series) should be confirmed on that first run.
 - Revision risk labels in `series.json` are initial judgements - review them.
-- First-release values and revision history (FRED's ALFRED) are not stored yet.
-- No frequency conversion: a quarterly series stays quarterly. Choosing how to align them is a separate step.
+- First-release values exist only from when FRED's archive starts for each series; earlier rows show latest values.
+- First-release GDP levels are in different base-year dollars over time; use the growth series for first-release work.
